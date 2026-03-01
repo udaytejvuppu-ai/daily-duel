@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/socket.io/socket.io.js"></script>
+    <title>Daily Duel</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body onload="fetchData()">
+    <div id="todaysWinner" style="text-align: center; font-size: 1.5rem; margin: 20px; font-weight: bold; color: #ffca28;"></div>
+
+    <div class="app-container">
+        <main class="main-content">
+            <header>
+                <h1>Daily Duel</h1>
+                <div class="date-card">
+                    <div class="timezone">🌐 INDIAN STANDARD TIME</div>
+                    <div class="time" id="datetime"></div>
+                </div>
+            </header>
+
+            <section class="scoreboard">
+                <div class="score-card p2-border">
+                    <div class="player-name">UDAY</div>
+                    <div class="score" id="scoreUday">0</div>
+                </div>
+                <div class="score-card p1-border">
+                    <div class="player-name">PRIYA</div>
+                    <div class="score" id="scorePriya">0</div>
+                </div>
+                <div class="trophy">🏆</div>
+            </section>
+
+            <section class="analytics-section">
+                <h2>Total Score Trend</h2>
+                <div class="chart-container">
+                    <canvas id="scoreChart"></canvas>
+                </div>
+            </section>
+
+            <section class="grid-layout">
+                <div class="quests">
+                    <div class="quest-header">
+                        <h2>Tasks for: <span id="selectedDateDisplay">Today</span></h2>
+                        <button id="addTaskBtn" class="add-btn" onclick="openModal()">+ Add Task</button>
+                    </div>
+                    <div id="habitList"></div>
+                </div>
+                
+                <div class="calendar-section">
+                    <div class="calendar-header">
+                        <h2>Battle Calendar</h2>
+                        <button class="today-btn" onclick="jumpToToday()">Today</button>
+                    </div>
+                    <div id="calendar-container" class="calendar-container"></div>
+                    
+                    <div class="day-controls">
+                        <input type="text" id="dayNote" placeholder="Notes for this day...">
+                        <button class="important-btn" onclick="toggleBackendImportant()">Mark Date Important</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2>New Task</h2>
+            <input type="text" id="modalName" placeholder="Task Name">
+            <input type="text" id="modalEmoji" placeholder="Emoji (e.g. 🏋️)">
+            <select id="modalOwner">
+                <option value="2">Uday</option>
+                <option value="1">Priya</option>
+            </select>
+            <button class="submit-btn" onclick="submitModalTask()">Add Task</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
