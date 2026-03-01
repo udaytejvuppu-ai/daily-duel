@@ -1,6 +1,18 @@
 // --- Initialize Socket.io ---
 const socket = io();
 
+// --- User Selection & Theme Logic ---
+// We ask for user immediately to set the theme
+const user = prompt("Are you Uday or Priya? (Type 'Uday' or 'Priya')");
+const userName = user && user.toLowerCase() === 'uday' ? 'uday' : 'priya';
+const themeColor = userName === 'uday' ? 'blue' : 'pink';
+
+// Apply theme to the whole page immediately
+document.documentElement.style.setProperty('--main-color', themeColor);
+// Add a subtle border to indicate the user
+document.body.style.borderTop = `10px solid ${themeColor}`;
+
+
 // --- Get Current Date in YYYY-MM-DD format ---
 function getTodayDateString() {
     const today = new Date();
@@ -195,26 +207,35 @@ function calculateTodaysWinner() {
     else winnerEl.innerText = "🤝 It's a tie today!";
 }
 
-// --- Chart.js Plotting ---
+// --- Chart.js Plotting (Updated for Accuracy) ---
 let habitChart;
 function renderChart() {
     const chartCanvas = document.getElementById('scoreChart');
     if (!chartCanvas) return;
     const ctx = chartCanvas.getContext('2d');
     
+    // Get all dates and sort them
     const dates = Object.keys(dateStore).sort();
     
     let cumulativeP1 = 0;
     let cumulativeP2 = 0;
     const p1Data = dates.map(date => {
         let dayScore = 0;
-        dateStore[date].tasks.forEach(t => t.completed && t.owner === '1' ? dayScore += 10 : 0);
+        if(dateStore[date] && dateStore[date].tasks) {
+            dateStore[date].tasks.forEach(t => {
+                if(t.completed && t.owner === '1') dayScore += 10;
+            });
+        }
         cumulativeP1 += dayScore;
         return cumulativeP1;
     });
     const p2Data = dates.map(date => {
         let dayScore = 0;
-        dateStore[date].tasks.forEach(t => t.completed && t.owner === '2' ? dayScore += 10 : 0);
+        if(dateStore[date] && dateStore[date].tasks) {
+            dateStore[date].tasks.forEach(t => {
+                if(t.completed && t.owner === '2') dayScore += 10;
+            });
+        }
         cumulativeP2 += dayScore;
         return cumulativeP2;
     });
@@ -225,8 +246,22 @@ function renderChart() {
         data: {
             labels: dates,
             datasets: [
-                { label: 'Priya', data: p1Data, borderColor: '#ff85a2', tension: 0.3, backgroundColor: 'rgba(255,133,162,0.2)', fill: true },
-                { label: 'Uday', data: p2Data, borderColor: '#4dadff', tension: 0.3, backgroundColor: 'rgba(77,173,255,0.2)', fill: true }
+                { 
+                    label: 'Priya', 
+                    data: p1Data, 
+                    borderColor: '#ff85a2', 
+                    tension: 0.2, // Straighter lines for accuracy
+                    backgroundColor: 'rgba(255,133,162,0.2)', 
+                    fill: true 
+                },
+                { 
+                    label: 'Uday', 
+                    data: p2Data, 
+                    borderColor: '#4dadff', 
+                    tension: 0.2, // Straighter lines for accuracy
+                    backgroundColor: 'rgba(77,173,255,0.2)', 
+                    fill: true 
+                }
             ]
         },
         options: { 
@@ -235,7 +270,12 @@ function renderChart() {
             scales: { 
                 y: { beginAtZero: true, grid: { color: '#333' } }, 
                 x: { grid: { color: '#333' } } 
-            } 
+            },
+            plugins: {
+                legend: {
+                    labels: { color: 'white' }
+                }
+            }
         }
     });
 }
@@ -269,3 +309,6 @@ function renderCalendar() {
         calendar.innerHTML += `<div class="${className}" onclick="changeDate('${dateStr}')">${i}</div>`;
     }
 }
+
+// Initial fetch
+fetchData();
